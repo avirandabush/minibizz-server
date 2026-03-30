@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id
+
+  name      String
+
+  contact     String
+  business    String
+  preferences String
+
+  plan   String
+  status String
+
+  createdAt DateTime
+  updatedAt DateTime
+  lastLogin DateTime
+
+  customers  Customer[]
+  payments   Payment[]
+  treatments Treatment[]
+}
+
+model Customer {
+  id     String @id @default(uuid())
+  userId String
+
+  personal String
+  contact  String
+  stats    String
+
+  leadSource String
+  isActive   Boolean
+
+  createdAt DateTime
+  updatedAt DateTime
+
+  user User @relation(fields: [userId], references: [id])
+  payments Payment[]
+}
+
+model Treatment {
+  id     String @id @default(uuid())
+  userId String
+
+  name        String
+  description String
+
+  isFavorite Boolean?
+  isActive   Boolean?
+
+  specs String
+  color String
+
+  createdAt DateTime
+  updatedAt DateTime
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Payment {
+  id        String @id @default(uuid())
+  userId    String
+  customerId String
+
+  items   String
+  summary String
+
+  method String
+  status String
+  date   DateTime
+
+  referenceNumber String
+
+  createdAt DateTime
+  updatedAt DateTime
+
+  user     User     @relation(fields: [userId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+}
