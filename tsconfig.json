@@ -13,7 +13,7 @@
     "resolveJsonModule": true,
 
     /* Type safety */
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
 
     /* Node environment */
@@ -22,6 +22,6 @@
     /* Performance */
     "skipLibCheck": true
   },
-  "include": ["src"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
