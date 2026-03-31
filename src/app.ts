@@ -8,7 +8,15 @@ import usersRouter from './modules/users/users.routes'
 
 export const app = express()
 
-app.use(cors({ origin: '*' }))
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'https://minibizz.avirandabush.co.il'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json())
 
 app.get('/', (req, res) => {
