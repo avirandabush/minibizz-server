@@ -21,9 +21,9 @@ model User {
 
   name      String
 
-  contact     String
-  business    String
-  preferences String
+  contact     String    @db.Text
+  business    String    @db.Text
+  preferences String    @db.Text
 
   plan   String
   status String
@@ -41,9 +41,9 @@ model Customer {
   id     String @id @default(uuid())
   userId String
 
-  personal String
-  contact  String
-  stats    String
+  personal String    @db.Text
+  contact  String    @db.Text
+  stats    String    @db.Text
 
   leadSource String
   isActive   Boolean
@@ -60,13 +60,13 @@ model Treatment {
   userId String
 
   name        String
-  description String
+  description String    @db.Text
 
   isFavorite Boolean?
   isActive   Boolean?
 
-  specs String
-  color String
+  specs       String    @db.Text
+  color       String
 
   createdAt DateTime
   updatedAt DateTime
@@ -79,8 +79,8 @@ model Payment {
   userId    String
   customerId String
 
-  items   String
-  summary String
+  items   String    @db.Text
+  summary String    @db.Text
 
   method String
   status String
