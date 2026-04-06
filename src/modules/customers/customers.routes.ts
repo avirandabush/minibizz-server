@@ -1,108 +1,141 @@
 import { Router } from 'express'
 import { prisma } from '../../config/prisma'
 import { attachUser } from '../../middleware/auth.middleware'
+import { safeParse } from '../../utils/safeJson'
+import { handleError } from '../../utils/handleError'
 
 const router = Router()
 router.use(attachUser)
 
 router.get('/', async (req, res) => {
-    const userId = (req as any).userId
+    try {
+        const userId = (req as any).userId
 
-    const customers = await prisma.customer.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-    })
+        const customers = await prisma.customer.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+        })
 
-    res.json(
-        customers.map(c => ({
-            ...c,
-            personal: JSON.parse(c.personal),
-            contact: JSON.parse(c.contact),
-            stats: JSON.parse(c.stats),
-        }))
-    )
+        res.json(
+            customers.map(c => ({
+                ...c,
+                personal: safeParse(c.personal, {}),
+                contact: safeParse(c.contact, {}),
+                stats: safeParse(c.stats, {}),
+            }))
+        )
+    } catch (error) {
+        handleError(res, error, "Failed to fetch customers");
+    }
 })
 
 router.get('/:id', async (req, res) => {
-    const userId = (req as any).userId
+    try {
+        const userId = (req as any).userId
 
-    const c = await prisma.customer.findFirst({
-        where: { id: req.params.id, userId },
-    })
+        const c = await prisma.customer.findFirst({
+            where: {
+                id: req.params.id,
+                userId,
+            },
+        })
 
-    if (!c) return res.status(404).send('Not found')
+        if (!c) return res.status(404).send('Not found')
 
-    res.json({
-        ...c,
-        personal: JSON.parse(c.personal),
-        contact: JSON.parse(c.contact),
-        stats: JSON.parse(c.stats),
-    })
+        res.json({
+            ...c,
+            personal: safeParse(c.personal, {}),
+            contact: safeParse(c.contact, {}),
+            stats: safeParse(c.stats, {}),
+        })
+    } catch (error) {
+        handleError(res, error, "Failed to fetch customer");
+    }
 })
 
 router.post('/', async (req, res) => {
-    const userId = (req as any).userId
+    try {
+        const userId = (req as any).userId
 
-    const customer = await prisma.customer.create({
-        data: {
-            userId,
-            personal: JSON.stringify(req.body.personal),
-            contact: JSON.stringify(req.body.contact),
-            stats: JSON.stringify(req.body.stats || {}),
+        const customer = await prisma.customer.create({
+            data: {
+                userId,
+                personal: JSON.stringify(req.body.personal),
+                contact: JSON.stringify(req.body.contact),
+                stats: JSON.stringify(req.body.stats || {}),
 
-            leadSource: req.body.leadSource,
-            isActive: req.body.isActive ?? true,
+                leadSource: req.body.leadSource,
+                isActive: req.body.isActive ?? true,
 
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        },
-    })
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        })
 
-    res.json({
-        ...customer,
-        personal: JSON.parse(customer.personal),
-        contact: JSON.parse(customer.contact),
-        stats: JSON.parse(customer.stats),
-    })
+        res.json({
+            ...customer,
+            personal: safeParse(customer.personal, {}),
+            contact: safeParse(customer.contact, {}),
+            stats: safeParse(customer.stats, {}),
+        })
+    } catch (error) {
+        handleError(res, error, "Failed to create customer");
+    }
 })
 
 router.patch('/:id', async (req, res) => {
-    const userId = (req as any).userId
+    try {
+        const userId = (req as any).userId
 
-    const updated = await prisma.customer.update({
-        where: { id: req.params.id },
-        data: {
-            personal: req.body.personal
-                ? JSON.stringify(req.body.personal)
-                : undefined,
-            contact: req.body.contact
-                ? JSON.stringify(req.body.contact)
-                : undefined,
-            stats: req.body.stats
-                ? JSON.stringify(req.body.stats)
-                : undefined,
+        const updated = await prisma.customer.update({
+            where: {
+                id: req.params.id,
+                userId,
+            },
+            data: {
+                personal: req.body.personal
+                    ? JSON.stringify(req.body.personal)
+                    : undefined,
+                contact: req.body.contact
+                    ? JSON.stringify(req.body.contact)
+                    : undefined,
+                stats: req.body.stats
+                    ? JSON.stringify(req.body.stats)
+                    : undefined,
 
-            leadSource: req.body.leadSource,
-            isActive: req.body.isActive,
+                leadSource: req.body.leadSource,
+                isActive: req.body.isActive,
 
-            updatedAt: new Date(),
-        },
-    })
+                updatedAt: new Date(),
+            },
+        })
 
-    res.json({
-        ...updated,
-        personal: JSON.parse(updated.personal),
-        contact: JSON.parse(updated.contact),
-        stats: JSON.parse(updated.stats),
-    })
+        res.json({
+            ...updated,
+            personal: safeParse(updated.personal, {}),
+            contact: safeParse(updated.contact, {}),
+            stats: safeParse(updated.stats, {}),
+        })
+    } catch (error) {
+        handleError(res, error, "Failed to update customer");
+    }
 })
 
 router.delete('/:id', async (req, res) => {
-    await prisma.customer.delete({
-        where: { id: req.params.id },
-    })
+    try {
+        const userId = (req as any).userId
 
-    res.json({ success: true })
+        await prisma.customer.delete({
+            where: {
+                id: req.params.id,
+                userId,
+            },
+        })
+
+        res.json({ success: true })
+    } catch (error) {
+        handleError(res, error, "Failed to delete customer");
+    }
 })
 
 export default router
