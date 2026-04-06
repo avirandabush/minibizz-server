@@ -1,0 +1,7 @@
+export function handleError(res: any, error: any, message: string) {
+    console.error(message, error)
+
+    res.status(500).json({
+        error: message,
+    })
+}
