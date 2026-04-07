@@ -28,6 +28,31 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.get('/:id', async (req, res) => {
+    try {
+        const userId = (req as any).userId
+
+        const payment = await prisma.payment.findFirst({
+            where: {
+                id: req.params.id,
+                userId,
+            },
+        })
+
+        if (!payment) {
+            return res.status(404).json({ error: "Payment not found" })
+        }
+
+        res.json({
+            ...payment,
+            items: safeParse(payment.items, []),
+            summary: safeParse(payment.summary, { subtotal: 0, discount: 0, total: 0 }),
+        })
+    } catch (error) {
+        handleError(res, error, "Failed to fetch payment");
+    }
+})
+
 router.post('/', async (req, res) => {
     try {
         const userId = (req as any).userId
