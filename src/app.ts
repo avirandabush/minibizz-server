@@ -5,6 +5,7 @@ import customersRouter from './modules/customers/customers.routes'
 import paymentsRouter from './modules/payments/payments.routes'
 import treatmentsRouter from './modules/treatments/treatments.routes'
 import usersRouter from './modules/users/users.routes'
+import packageJson from '../package.json'
 
 export const app = express()
 
@@ -20,7 +21,13 @@ app.use(cors({
 app.use(express.json())
 
 app.get('/', (req, res) => {
-    res.send('API is running 🚀')
+    res.json({ 
+        message: 'API is running 🚀',
+        status: 'online',
+        version: packageJson.version,
+        environment: process.env.NODE_ENV || 'development',
+        uptime: process.uptime(),
+    }) 
 })
 
 app.use('/users', usersRouter)
