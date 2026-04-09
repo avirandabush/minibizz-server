@@ -8,20 +8,16 @@ const router = Router()
 
 router.post('/', async (req, res) => {
     try {
-        const { authId, userId, ...data } = req.body
-        const idToUse = authId || userId
-
-        if (!idToUse) {
-            return res.status(400).json({ error: 'Missing authId from Firebase' })
-        }
+        const userId = (req as any).userId
+        const data = req.body
 
         const existing = await prisma.user.findUnique({
-            where: { id: idToUse },
+            where: { id: userId },
         })
 
         if (existing) {
             const updated = await prisma.user.update({
-                where: { id: idToUse },
+                where: { id: userId },
                 data: { lastLogin: new Date() }
             })
 
@@ -35,7 +31,7 @@ router.post('/', async (req, res) => {
 
         const user = await prisma.user.create({
             data: {
-                id: idToUse,
+                id: userId,
                 ...data,
                 contact: JSON.stringify(data.contact || {}),
                 business: JSON.stringify(data.business || {}),
