@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 // For each change, run: npx prisma db push
 // For dev and prod DB.
 
@@ -17,19 +11,18 @@ datasource db {
 }
 
 model User {
-  id        String    @id
+  id   String @id
+  name String
 
-  name      String
-
-  contact     String    @db.Text
-  business    String    @db.Text
-  preferences String    @db.Text
+  contact     String @db.LongText
+  business    String @db.LongText
+  preferences String @db.LongText
 
   plan   String
   status String
 
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   lastLogin DateTime
 
   customers  Customer[]
@@ -41,18 +34,21 @@ model Customer {
   id     String @id @default(uuid())
   userId String
 
-  personal String    @db.Text
-  contact  String    @db.Text
-  stats    String    @db.Text
+  personal String @db.LongText
+  contact  String @db.LongText
+  stats    String @db.LongText
 
   leadSource String
   isActive   Boolean
 
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
+
   payments Payment[]
+
+  @@index([userId])
 }
 
 model Treatment {
@@ -60,27 +56,29 @@ model Treatment {
   userId String
 
   name        String
-  description String    @db.Text
+  description String
 
-  isFavorite Boolean?
-  isActive   Boolean?
+  isFavorite Boolean @default(false)
+  isActive   Boolean @default(true)
 
-  specs       String    @db.Text
-  color       String
+  specs String @db.LongText
+  color String
 
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model Payment {
-  id        String @id @default(uuid())
-  userId    String
+  id         String @id @default(uuid())
+  userId     String
   customerId String
 
-  items   String    @db.Text
-  summary String    @db.Text
+  items   String @db.LongText
+  summary String @db.LongText
 
   method String
   status String
@@ -88,9 +86,12 @@ model Payment {
 
   referenceNumber String
 
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user     User     @relation(fields: [userId], references: [id])
   customer Customer @relation(fields: [customerId], references: [id])
+
+  @@index([userId])
+  @@index([customerId])
 }
