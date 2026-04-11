@@ -18,16 +18,17 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json())
 
 app.get('/', (req, res) => {
-    res.json({ 
+    res.json({
         message: 'API is running 🚀',
         status: 'online',
         version: packageJson.version,
         environment: process.env.NODE_ENV || 'development',
         uptime: process.uptime(),
-    }) 
+    })
 })
 
 app.use('/users', usersRouter)
