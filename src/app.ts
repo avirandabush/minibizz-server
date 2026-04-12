@@ -1,11 +1,19 @@
 import express from 'express'
 import cors from 'cors'
 
+import { initializeFirebase } from './config/firebase'
 import customersRouter from './modules/customers/customers.routes'
 import paymentsRouter from './modules/payments/payments.routes'
 import treatmentsRouter from './modules/treatments/treatments.routes'
 import usersRouter from './modules/users/users.routes'
 import packageJson from '../package.json'
+
+try {
+    initializeFirebase()
+} catch (error) {
+    console.error('Failed to initialize Firebase Admin:', error);
+    process.exit(1);
+}
 
 export const app = express()
 
@@ -16,7 +24,7 @@ app.use(cors({
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-dev-token']
 }));
 
 app.use(express.json())
